@@ -23,7 +23,11 @@
   },
   "dependencies": {
     "concurrently": "^8.0.1",
+    "cors": "^2.8.5",
+    "cros": "^1.0.1",
     "express": "^4.17.1",
+    "mongodb": "^5.2.0",
+    "mongoose": "^7.0.3",
     "nodemon": "^2.0.22"
   }
 }
