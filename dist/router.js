@@ -11,5 +11,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = (app) => __awaiter(void 0, void 0, void 0, function* () {
     app.use("/api/user", require("./api/user"));
+    app.use("/api/employee", require("./api/employee"));
 });
 //# sourceMappingURL=router.js.map

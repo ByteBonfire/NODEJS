@@ -15,6 +15,14 @@ exports.userSchema = mongoose.Schema({
         type: String,
         require: true,
     },
+    age: {
+        type: String,
+        require: true,
+    },
+    address: {
+        type: String,
+        require: true,
+    },
 });
 exports.default = mongoose.model("User", exports.userSchema);
 //# sourceMappingURL=user.model.js.map

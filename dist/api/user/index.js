@@ -8,6 +8,7 @@ const router = express_1.default.Router();
 const user_controller_1 = __importDefault(require("./user.controller"));
 const userCtrl = new user_controller_1.default();
 router.get("/get-user/:id", userCtrl.getUser);
+router.get("/get-user/", userCtrl.getAllUser);
 router.get("/user-performance", userCtrl.getUserForPerformance, userCtrl.getUserPerformance);
 router.post("/post-user", userCtrl.insertUser);
 router.put("/put-user/:id", userCtrl.updateUser);

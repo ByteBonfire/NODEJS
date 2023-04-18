@@ -1,8 +1,19 @@
 import { ObjectId } from "mongodb";
 import User from "./user.model";
+import userModel from "./user.model";
 
 export default class userController {
   model = User;
+
+  getAllUser = (req, res, next) => {
+    User.find({})
+      .then((response) => {
+        return res.status(200).json(response);
+      })
+      .catch((error) => {
+        return res.status(500).json({ message: "Error Retriving User", error });
+      });
+  };
 
   getUser = (req, res, next) => {
     console.log(req.params.id);
@@ -18,12 +29,10 @@ export default class userController {
   };
 
   insertUser = (req, res, next) => {
-    console.log(req.body);
     const newuser = new User(req.body);
-    console.log(newuser);
+
     newuser.save().then(
       (response) => {
-        console.log("response");
         return res.status(500).send(response);
       },
       (error) => {}
@@ -32,27 +41,54 @@ export default class userController {
 
   updateUser = (req, res, next) => {
     const UserId = req.params.id;
-    const update = new Map();
-    update.set("name", req.body.name);
-    update.set("address", req.body.address);
-    update.set("age", req.body.age);
-    update.set("email", req.body.email);
-    update.set("password", req.body.password);
-    User.updateOne({ id: UserId }, update).then(
-      (response) => {
-        return res.status(500).send(response);
-      },
-      (error) => {}
-    );
+    const update = {};
+
+    for (const key in req.body) {
+      update[key] = req.body[key];
+    }
+
+    User.updateOne({ _id: UserId }, update)
+      .then((response) => {
+        if (response.modifiedCount > 0) {
+          res.status(200).json({
+            message: "user updated successfully",
+            response,
+          });
+        } else {
+          res.status(200).json({
+            message: "user was not updated",
+            response,
+          });
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        res.status(500).json({ error: "Server error" });
+      });
   };
 
   deleteUser = (req, res, next) => {
-    User.deleteOne({ _id: new ObjectId(req.params.id) }).then(
-      (response) => {
-        return res.status(500).send(response);
-      },
-      (error) => {}
-    );
+    const UserId = req.params.id;
+
+    User.deleteOne({ _id: UserId })
+      .then((result) => {
+        if (result.deletedCount > 0) {
+          res.status(200).json({
+            message: "User deleted successfully",
+            data: result,
+          });
+        } else {
+          res.status(404).json({
+            message: "User not found",
+          });
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+        res.status(500).json({
+          error: "Server error",
+        });
+      });
   };
 
   getUserForPerformance = (req, res, next) => {

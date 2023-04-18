@@ -5,6 +5,7 @@ import userController from "./user.controller";
 const userCtrl = new userController();
 
 router.get("/get-user/:id", userCtrl.getUser);
+router.get("/get-user/", userCtrl.getAllUser);
 
 router.get(
   "/user-performance",
