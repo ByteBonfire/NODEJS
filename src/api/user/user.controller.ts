@@ -1,10 +1,11 @@
 import { ObjectId } from "mongodb";
 import User from "./user.model";
-import userModel from "./user.model";
+const bcrypt = require("bcrypt");
 
 export default class userController {
   model = User;
 
+  // get all user
   getAllUser = (req, res, next) => {
     User.find({})
       .then((response) => {
@@ -15,8 +16,12 @@ export default class userController {
       });
   };
 
+  // get specific user with id
+
   getUser = (req, res, next) => {
     console.log(req.params.id);
+    //check the userID and get the data
+
     User.find({ _id: new ObjectId(req.params.id) }).then(
       (response) => {
         console.log(response);
@@ -28,16 +33,70 @@ export default class userController {
     );
   };
 
-  insertUser = (req, res, next) => {
-    const newuser = new User(req.body);
+  // insert the user in database
 
-    newuser.save().then(
-      (response) => {
-        return res.status(500).send(response);
-      },
-      (error) => {}
-    );
+  insertUser = async (req, res, next) => {
+    try {
+      //check existing email address
+      const existingUser = await User.findOne({ email: req.body.email });
+      if (existingUser) {
+        return res.status(409).send("User with this email already exists");
+      }
+      // Generate salt
+      const salt = await bcrypt.genSalt(10);
+      if (!salt) {
+        throw new Error("Failed to generate salt for password hashing");
+      }
+
+      // Hash password and create new user
+      const hashedPassword = await bcrypt.hash(req.body.password, salt);
+      const newUser = new User({
+        name: req.body.name,
+        email: req.body.email,
+        password: hashedPassword,
+        age: req.body.age,
+        address: req.body.address,
+      });
+      await newUser.save();
+
+      return res.status(201).send(newUser);
+    } catch (err) {
+      console.error(err);
+      return res.status(500).send("Internal Server Error");
+    }
+    // this below code is to directly insert the user without hashing & salting user info
+
+    // const newuser = new User(req.body);
+    //    newuser.save().then(
+
+    //     (response) => {
+    //       return res.status(201).send(response);
+    //     },
+    //     (error) => {
+    //       return res.status(500).send();
+    //     }
+    //   );
   };
+
+  // Authenticate the user
+
+  authUser = async (req, res, next) => {
+    try {
+      const authUser = await User.findOne({ email: req.body.email }).exec();
+      if (!authUser) {
+        return res.status(400).send("Cannot find user");
+      }
+      if (await bcrypt.compare(req.body.password, authUser.password)) {
+        res.send("Success");
+      } else {
+        res.send("Not Allowed");
+      }
+    } catch (error) {
+      res.status(500).send(error);
+    }
+  };
+
+  // update the specific user
 
   updateUser = (req, res, next) => {
     const UserId = req.params.id;
@@ -67,6 +126,8 @@ export default class userController {
       });
   };
 
+  // delete the specific user
+
   deleteUser = (req, res, next) => {
     const UserId = req.params.id;
 
@@ -90,6 +151,8 @@ export default class userController {
         });
       });
   };
+
+  // get the performance and understand the next() function
 
   getUserForPerformance = (req, res, next) => {
     User.find({ id: req.params.id }).then(

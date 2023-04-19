@@ -1,11 +1,12 @@
 import { ObjectId } from "mongodb";
-import Employee from "./employee.model";
+import employee from "./employee.model";
 
-export default class EmployeeController {
-  model = Employee;
+export default class employeeController {
+  model = employee;
 
   getAllEmployee = (req, res, next) => {
-    Employee.find({})
+    employee
+      .find({})
       .then((responses) => {
         res.status(200).json(responses);
       })
@@ -15,7 +16,7 @@ export default class EmployeeController {
   };
 
   getEmployee = (req, res, next) => {
-    Employee.find({ _id: new ObjectId(req.params.id) }).then(
+    employee.find({ _id: new ObjectId(req.params.id) }).then(
       (response) => {
         return res.status(200).json({ employees: response });
       },
@@ -26,7 +27,7 @@ export default class EmployeeController {
   };
 
   insertEmployee = (req, res, next) => {
-    const newEmployee = new Employee(req.body);
+    const newEmployee = new employee(req.body);
     console.log(newEmployee);
     newEmployee.save().then(
       (response) => {
@@ -46,7 +47,8 @@ export default class EmployeeController {
       update[key] = req.body[key];
     }
 
-    Employee.updateOne({ _id: employeeId }, update)
+    employee
+      .updateOne({ _id: employeeId }, update)
       .then((response) => {
         if (response.modifiedCount > 0) {
           res.status(200).json({
@@ -69,7 +71,8 @@ export default class EmployeeController {
   deleteEmployee = (req, res, next) => {
     const employeeId = req.params.id;
 
-    Employee.deleteOne({ _id: employeeId })
+    employee
+      .deleteOne({ _id: employeeId })
       .then((result) => {
         if (result.deletedCount > 0) {
           res.status(200).json({

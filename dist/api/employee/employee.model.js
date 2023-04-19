@@ -28,5 +28,5 @@ exports.EmployeeSchema = mongoose.Schema({
         require: true,
     },
 });
-exports.default = mongoose.model("Employee", exports.EmployeeSchema);
+exports.default = mongoose.model("employee", exports.EmployeeSchema);
 //# sourceMappingURL=employee.model.js.map

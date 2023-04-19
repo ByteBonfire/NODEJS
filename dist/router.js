@@ -12,5 +12,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = (app) => __awaiter(void 0, void 0, void 0, function* () {
     app.use("/api/user", require("./api/user"));
     app.use("/api/employee", require("./api/employee"));
+    app.use("/api/authUser", require("./api/authUser"));
 });
 //# sourceMappingURL=router.js.map

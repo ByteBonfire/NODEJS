@@ -5,11 +5,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongodb_1 = require("mongodb");
 const employee_model_1 = __importDefault(require("./employee.model"));
-class EmployeeController {
+class employeeController {
     constructor() {
         this.model = employee_model_1.default;
         this.getAllEmployee = (req, res, next) => {
-            employee_model_1.default.find({})
+            employee_model_1.default
+                .find({})
                 .then((responses) => {
                 res.status(200).json(responses);
             })
@@ -39,7 +40,8 @@ class EmployeeController {
             for (const key in req.body) {
                 update[key] = req.body[key];
             }
-            employee_model_1.default.updateOne({ _id: employeeId }, update)
+            employee_model_1.default
+                .updateOne({ _id: employeeId }, update)
                 .then((response) => {
                 if (response.modifiedCount > 0) {
                     res.status(200).json({
@@ -61,7 +63,8 @@ class EmployeeController {
         };
         this.deleteEmployee = (req, res, next) => {
             const employeeId = req.params.id;
-            employee_model_1.default.deleteOne({ _id: employeeId })
+            employee_model_1.default
+                .deleteOne({ _id: employeeId })
                 .then((result) => {
                 if (result.deletedCount > 0) {
                     res.status(200).json({
@@ -84,5 +87,5 @@ class EmployeeController {
         };
     }
 }
-exports.default = EmployeeController;
+exports.default = employeeController;
 //# sourceMappingURL=employee.controller.js.map
