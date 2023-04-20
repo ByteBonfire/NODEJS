@@ -12,10 +12,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const config_1 = __importDefault(require("../../config/config"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const crypto = require("crypto");
-const dotenv = require("dotenv");
-// const fs = require("fs");
 const authUserSchema = new mongoose_1.default.Schema({
     username: {
         type: String,
@@ -33,6 +32,7 @@ const authUserSchema = new mongoose_1.default.Schema({
         type: String,
     },
 });
+const salt = config_1.default.Salt;
 authUserSchema.pre("save", function (next) {
     return __awaiter(this, void 0, void 0, function* () {
         const user = this;
@@ -40,20 +40,10 @@ authUserSchema.pre("save", function (next) {
         if (!user.isModified("password"))
             return next();
         //   const salt = crypto.randomBytes(16).toString("hex");
-        // Load environment variables from .env file
-        dotenv.config();
-        const salt = process.env.SALT_VALUE;
-        console.log(process.env.SALT_VALUE);
-        if (!salt) {
-            throw new Error("Failed to fetch salt for password hashing");
-        }
+        console.log(salt);
         const hash = crypto
             .pbkdf2Sync(user.password, salt, 1000, 64, `sha512`)
             .toString(`hex`);
-        //   // Set SALT variable to the generated salt
-        //   process.env.SALT = salt;
-        //   // Update .env file with new value for SALT
-        //   fs.writeFileSync(".env", "SALT=" + salt);
         user.password = hash;
         next();
     });

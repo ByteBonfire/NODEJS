@@ -8,6 +8,9 @@ const authCtrl = new authuser_controller_1.default();
 const express_1 = __importDefault(require("express"));
 const router = express_1.default.Router();
 router.post("/signup/", authCtrl.insertUser);
-// router.post("/login/", authCtrl.insertUser);
+router.post("/login/", authCtrl.loginUser, (req, res, next) => {
+    console.log("adfasdf", req.SUCESS_MESSAGE);
+});
+router.get("/getuser/", authCtrl.getuser);
 module.exports = router;
 //# sourceMappingURL=index.js.map

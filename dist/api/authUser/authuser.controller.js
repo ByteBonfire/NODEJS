@@ -13,7 +13,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const authuser_model_1 = __importDefault(require("./authuser.model"));
-class AuthUserController {
+const crypto = require("crypto");
+const config_1 = __importDefault(require("../../config/config"));
+class authUserController {
     constructor() {
         this.model = authuser_model_1.default;
         this.insertUser = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
@@ -38,7 +40,40 @@ class AuthUserController {
                 res.status(500).json({ error: "Failed to insert user." });
             }
         });
+        this.loginUser = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+            // const salt= config.Salt
+            try {
+                const { email, password } = req.body;
+                const user = yield authuser_model_1.default.findOne({ email });
+                if (!user) {
+                    return res.status(401).send("Email not found");
+                }
+                const hashpassword = crypto
+                    .pbkdf2Sync(password, config_1.default.Salt, 1000, 64, "sha512")
+                    .toString("hex");
+                if (user.password !== hashpassword) {
+                    return res.status(401).send("Invalid email or password");
+                }
+                // res.status(200).json({ message: "Logged in successfully" });
+                req.SUCESS_MESSAGE = "logged in sucessfully";
+                return next();
+            }
+            catch (error) {
+                console.error(error);
+                res.status(500).json({ error: "Failed to log in." });
+            }
+        });
+        this.getuser = (req, res, next) => {
+            authuser_model_1.default
+                .find({})
+                .then((responses) => {
+                res.status(200).json(responses);
+            })
+                .catch((error) => {
+                res.status(500).json({ message: "Error retrieving user", error });
+            });
+        };
     }
 }
-exports.default = AuthUserController;
+exports.default = authUserController;
 //# sourceMappingURL=authuser.controller.js.map

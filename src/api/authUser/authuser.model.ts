@@ -1,9 +1,7 @@
-import { CURSOR_FLAGS } from "mongodb";
+import config from "../../config/config";
 import mongoose from "mongoose";
 const crypto = require("crypto");
 
-const dotenv = require("dotenv");
-// const fs = require("fs");
 const authUserSchema = new mongoose.Schema({
   username: {
     type: String,
@@ -21,6 +19,7 @@ const authUserSchema = new mongoose.Schema({
     type: String,
   },
 });
+const salt = config.Salt;
 
 authUserSchema.pre("save", async function (next) {
   const user = this;
@@ -30,23 +29,11 @@ authUserSchema.pre("save", async function (next) {
 
   //   const salt = crypto.randomBytes(16).toString("hex");
 
-  // Load environment variables from .env file
-  dotenv.config();
-  const salt = process.env.SALT_VALUE;
-  console.log(process.env.SALT_VALUE);
+  console.log(salt);
 
-  if (!salt) {
-    throw new Error("Failed to fetch salt for password hashing");
-  }
   const hash = crypto
     .pbkdf2Sync(user.password, salt, 1000, 64, `sha512`)
     .toString(`hex`);
-
-  //   // Set SALT variable to the generated salt
-  //   process.env.SALT = salt;
-
-  //   // Update .env file with new value for SALT
-  //   fs.writeFileSync(".env", "SALT=" + salt);
 
   user.password = hash;
   next();

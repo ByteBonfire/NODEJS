@@ -1,2 +1,5 @@
-// import dotenv from "dotenv";
-// dotenv.config();
+const dotenv = require("dotenv");
+dotenv.config();
+export default {
+  Salt: process.env.SALT_VALUE,
+};
