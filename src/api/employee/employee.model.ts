@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-export const EmployeeSchema = mongoose.Schema({
+export const EmployeeSchema = new mongoose.Schema({
   name: {
     type: String,
     require: true,

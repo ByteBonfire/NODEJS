@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EmployeeSchema = void 0;
 const mongoose = require("mongoose");
-exports.EmployeeSchema = mongoose.Schema({
+exports.EmployeeSchema = new mongoose.Schema({
     name: {
         type: String,
         require: true,
