@@ -32,17 +32,17 @@ const authUserSchema = new mongoose_1.default.Schema({
         type: String,
     },
 });
-const salt = config_1.default.Salt;
 authUserSchema.pre("save", function (next) {
     return __awaiter(this, void 0, void 0, function* () {
+        const salt_value = (0, config_1.default)();
         const user = this;
         //   console.log(user);
         if (!user.isModified("password"))
             return next();
         //   const salt = crypto.randomBytes(16).toString("hex");
-        console.log(salt);
+        // console.log(salt);
         const hash = crypto
-            .pbkdf2Sync(user.password, salt, 1000, 64, `sha512`)
+            .pbkdf2Sync(user.password, salt_value.salt_value, 1000, 64, `sha512`)
             .toString(`hex`);
         user.password = hash;
         next();

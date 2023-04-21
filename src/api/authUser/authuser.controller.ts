@@ -1,10 +1,21 @@
 import authUser from "./authuser.model";
 const crypto = require("crypto");
-import config from "../../config/config";
-import router from "../../router";
+import getEnvVar from "../../config/config";
+const jwt = require("jsonwebtoken");
 
 export default class authUserController {
   model = authUser;
+
+  getuser = (req, res, next) => {
+    authUser
+      .find({})
+      .then((responses) => {
+        res.status(200).json(responses);
+      })
+      .catch((error) => {
+        res.status(500).json({ message: "Error retrieving user", error });
+      });
+  };
 
   insertUser = async (req, res, next) => {
     try {
@@ -19,6 +30,7 @@ export default class authUserController {
       const newUser = new authUser(req.body);
       // console.log(newUser, "newuser");
 
+      //but befor save it call the pre save function in model.ts
       //   Save the user in database
       newUser.save().then((response) => {
         // console.log(response);
@@ -31,7 +43,8 @@ export default class authUserController {
   };
 
   loginUser = async (req, res, next) => {
-    // const salt= config.Salt
+    const env_value = getEnvVar();
+
     try {
       const { email, password } = req.body;
 
@@ -42,31 +55,41 @@ export default class authUserController {
       }
 
       const hashpassword = crypto
-        .pbkdf2Sync(password, config.Salt, 1000, 64, "sha512")
+        .pbkdf2Sync(password, env_value.salt_value, 1000, 64, "sha512")
         .toString("hex");
 
       if (user.password !== hashpassword) {
         return res.status(401).send("Invalid email or password");
       }
 
-      // res.status(200).json({ message: "Logged in successfully" });
-      req.SUCESS_MESSAGE = "logged in sucessfully";
-
-      return next();
+      next();
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Failed to log in." });
     }
   };
 
-  getuser = (req, res, next) => {
-    authUser
-      .find({})
-      .then((responses) => {
-        res.status(200).json(responses);
-      })
-      .catch((error) => {
-        res.status(500).json({ message: "Error retrieving user", error });
+  genToken = async (req, res, next) => {
+    try {
+      const user = await authUser.findOne({ email: req.body.email });
+      const userInfo = {
+        email: user.email,
+        userId: user._id,
+        username: user.username,
+      };
+      const env_value = getEnvVar();
+      const token = jwt.sign({ userInfo }, env_value.signature_value, {
+        expiresIn: "500000s",
       });
+
+      res.status(200).json({ token: token });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  };
+
+  getTokenUser = (req, res) => {
+    res.json({ message: "User info accessed", user: req.user });
   };
 }
