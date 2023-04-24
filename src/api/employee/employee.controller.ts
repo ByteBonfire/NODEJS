@@ -26,7 +26,14 @@ export default class employeeController {
     );
   };
 
-  insertEmployee = (req, res, next) => {
+  insertEmployee = async (req, res, next) => {
+    const existingUser = await employee.findOne({
+      email: req.body.email,
+    });
+
+    if (existingUser) {
+      return res.status(409).send(" Email already exists");
+    }
     const newEmployee = new employee(req.body);
     console.log(newEmployee);
     newEmployee.save().then(
